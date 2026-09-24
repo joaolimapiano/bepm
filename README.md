@@ -34,11 +34,13 @@ anonimizada (rostos pixelizados). Cada estratégia indica em quais casos foi doc
 
 ## Como citar
 
-> LIMA, João Gabriel Assunção. *BEPM: Banco de Estratégias de Prática Musical* (Versão 1.0.0)
-> \[Software\]. Curitiba: Programa de Pós-Graduação em Música, Universidade Federal do Paraná, 2026.
-> DOI: https://doi.org/10.5281/zenodo.22941545
+Formato APA (7ª edição):
 
-Um arquivo de citação legível por máquina está em [`CITATION.cff`](CITATION.cff).
+> Lima, J. G. A. (2026). *BEPM: Banco de Estratégias de Prática Musical* (Versão 1.0.0) \[Software\]. Zenodo. https://doi.org/10.5281/zenodo.22945685
+
+No texto: (Lima, 2026).
+
+Um arquivo de citação legível por máquina está em [`CITATION.cff`](CITATION.cff); o GitHub também exporta a citação em APA e BibTeX pelo botão "Cite this repository".
 
 ## Licença
 
