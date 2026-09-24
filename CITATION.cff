@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "Se você usar o BEPM, por favor cite conforme abaixo."
+title: "BEPM: Banco de Estratégias de Prática Musical"
+abstract: >-
+  Ferramenta interativa, aberta e offline que sugere estratégias de prática musical a partir do
+  problema enfrentado pelo estudante ou professor. Reúne 54 estratégias documentadas em pesquisa de
+  doutorado sobre a prática de pianistas experts ao aprender por melodia cifrada, organizadas em três
+  categorias (Seleção, Organização e Integração) e ilustradas por exemplos reais anonimizados em
+  áudio e vídeo.
+type: software
+authors:
+  - given-names: "João Gabriel Assunção"
+    family-names: "Lima"
+    orcid: "https://orcid.org/0000-0002-6037-4165"
+    affiliation: "Programa de Pós-Graduação em Música, Universidade Federal do Paraná"
+version: "1.0.0"
+date-released: "2026-11-10"
+license: CC-BY-4.0
+url: "https://joaolimapiano.github.io/bepm/"
+repository-code: "https://github.com/joaolimapiano/bepm"
+doi: "10.5281/zenodo.22941545"
+keywords:
+  - "prática musical"
+  - "estratégias de prática"
+  - "piano"
+  - "melodia cifrada"
+  - "aprendizagem musical"
+  - "educação musical"
+  - "música popular"

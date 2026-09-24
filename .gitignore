@@ -1,0 +1,35 @@
+# scripts e dados de build (nao fazem parte da distribuicao publicada)
+build.py
+bepm_dados.json
+__pycache__/
+*.pyc
+
+# artefatos do SO
+Thumbs.db
+.DS_Store
+
+# midia nao utilizada pela ferramenta
+midia/dg_qr02.m4a
+midia/dg_qr02.mp4
+midia/dg_qr06.m4a
+midia/dg_qr06.mp4
+midia/dg_qr13.m4a
+midia/dg_qr13.mp4
+midia/dg_qr13_2.m4a
+midia/dg_qr13_2.mp4
+midia/dg_qr17.m4a
+midia/dg_qr17.mp4
+midia/dg_qr20.m4a
+midia/dg_qr20.mp4
+midia/dg_qr22.m4a
+midia/dg_qr22.mp4
+midia/dg_qr23.m4a
+midia/dg_qr23.mp4
+midia/dg_qr24.m4a
+midia/dg_qr24.mp4
+midia/manifest.json
+midia/manifest_dg.json
+midia/qr16_SS_exploracao-iterativa.m4a
+midia/qr16_SS_exploracao-iterativa.mp4
+midia/qr23_DS_arranjo-final.m4a
+midia/qr23_DS_arranjo-final.mp4

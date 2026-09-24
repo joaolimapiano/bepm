@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BEPM · Banco de Estratégias de Prática Musical</title>
+<style>
+:root{
+  --paper:#f3f3f1; --card:#fbfbfa; --ink:#111112; --ink-soft:#3f3f41; --ink-faint:#5c5c5e;
+  --line:#c9c9c6; --line-soft:#e6e6e3; --rule:#111112;
+  --accent:#1730d9; --accent-ink:#ffffff;
+  --sel:#1730d9; --org:#7d2ba8; --int:#b23a1f;
+  --sel-bg:#e7eafb; --org-bg:#f4e9fa; --int-bg:#fbe9e3;
+  --shadow:none; --radius:0; --maxw:1060px;
+  --serif:system-ui,-apple-system,'Segoe UI Variable Text','Segoe UI',Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --paper:#101011; --card:#17171a; --ink:#f1f1ef; --ink-soft:#c2c2bf; --ink-faint:#9d9d9f;
+  --line:#33333a; --line-soft:#1e1e22; --rule:#f1f1ef;
+  --accent:#8b98ff; --accent-ink:#101011;
+  --sel:#8b98ff; --org:#d79bf0; --int:#f0a184;
+  --sel-bg:#1b1f3d; --org-bg:#2b1d33; --int-bg:#331e17;
+  --shadow:none;
+}}
+:root[data-theme=dark]{
+  --paper:#101011; --card:#17171a; --ink:#f1f1ef; --ink-soft:#c2c2bf; --ink-faint:#9d9d9f;
+  --line:#33333a; --line-soft:#1e1e22; --rule:#f1f1ef;
+  --accent:#8b98ff; --accent-ink:#101011;
+  --sel:#8b98ff; --org:#d79bf0; --int:#f0a184;
+  --sel-bg:#1b1f3d; --org-bg:#2b1d33; --int-bg:#331e17;
+  --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--serif);
+  line-height:1.55;-webkit-font-smoothing:antialiased}
+::selection{background:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(16px,4vw,28px)}
+
+header{position:sticky;top:0;z-index:30;background:var(--paper);border-bottom:1px solid var(--rule);padding:0}
+header .wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-top:10px;padding-bottom:10px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{border:0;background:transparent;padding:0;color:var(--ink);display:flex;align-items:center;
+  font-weight:600;font-size:16px;letter-spacing:-.03em;flex:none;font-family:inherit}
+h1{font-family:inherit;font-size:15px;margin:0;letter-spacing:-.03em;font-weight:600}
+.sub{color:var(--ink-faint);font-size:12.5px;margin:2px 0 0;max-width:46ch}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0;flex:1;justify-content:flex-end}
+.search{flex:1;max-width:none;min-width:150px;position:relative}
+.search input{width:100%;padding:10px 34px 10px 32px;border:1px solid var(--line);border-radius:0;
+  background:var(--card);color:var(--ink);font-size:14px;font-family:inherit}
+.search input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.6}
+.search:after{content:"/";position:absolute;right:9px;top:50%;transform:translateY(-50%);
+  font-size:11px;font-weight:600;color:var(--ink-faint);border:1px solid var(--line);padding:0 5px;line-height:1.5}
+.seg{display:inline-flex;border:0;border-radius:0;overflow:visible;background:transparent;flex-wrap:wrap;gap:2px}
+.seg button{border:0;background:transparent;color:var(--ink-soft);padding:10px 13px;font-size:13px;
+  cursor:pointer;font-weight:500;font-family:inherit;min-height:40px;border-radius:0}
+.seg button:hover{background:var(--line-soft)}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--paper);font-weight:600}
+.mtog{display:inline-flex;border:1px solid var(--line);border-radius:0;overflow:hidden;flex:none}
+.mtog button{border:0;background:transparent;color:var(--ink-soft);padding:9px 12px;font-family:inherit;
+  font-size:12px;font-weight:600;cursor:pointer;min-height:40px}
+.mtog button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink)}
+.themebtn{border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer;min-height:40px;
+  padding:0 11px;display:inline-flex;align-items:center;justify-content:center;border-radius:0;flex:none;font-family:inherit}
+.themebtn:hover{background:var(--line-soft);color:var(--ink)}
+.themebtn svg{width:16px;height:16px}
+.themebtn .ic-sun{display:none}
+.themebtn .ic-moon{display:inline-flex}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme=light]) .themebtn .ic-moon{display:none}
+  :root:not([data-theme=light]) .themebtn .ic-sun{display:inline-flex}
+}
+:root[data-theme=dark] .themebtn .ic-moon{display:none}
+:root[data-theme=dark] .themebtn .ic-sun{display:inline-flex}
+:root[data-theme=light] .themebtn .ic-moon{display:inline-flex}
+:root[data-theme=light] .themebtn .ic-sun{display:none}
+
+main{padding:clamp(22px,4vw,40px) 0 110px;min-height:60vh}
+.crumbs{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:0 0 20px;font-size:12px;color:var(--ink-faint)}
+.crumbs button{background:var(--line-soft);border:0;color:var(--ink-soft);cursor:pointer;padding:6px 10px;
+  font-family:inherit;font-size:12px;font-weight:500;border-radius:0;text-transform:lowercase}
+.crumbs button:hover{background:var(--ink);color:var(--paper)}
+.crumbs .sep{display:none}
+.crumbs .cur{color:var(--ink-faint);text-transform:lowercase}
+.progress{font-size:11.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);
+  margin:0 0 14px;font-variant-numeric:tabular-nums}
+.q{font-family:inherit;font-size:clamp(30px,5.4vw,48px);font-weight:600;line-height:1.02;letter-spacing:-.045em;
+  margin:0 0 26px;max-width:24ch;text-wrap:pretty}
+.hint{font-size:14.5px;color:var(--ink-soft);margin:-14px 0 26px;max-width:70ch}
+
+.opts{display:flex;flex-direction:column;gap:0;max-width:none;border-top:1px solid var(--rule);counter-reset:opt}
+.opt{display:flex;justify-content:flex-start;align-items:flex-start;gap:14px;width:100%;text-align:left;
+  border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;
+  padding:clamp(15px,2.4vw,21px) 4px;cursor:pointer;box-shadow:none;transition:background .12s;
+  font-family:inherit;color:var(--ink);counter-increment:opt}
+.opt:before{content:counter(opt,decimal-leading-zero);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;
+  color:var(--pc,var(--accent));width:24px;flex:none;padding-top:5px}
+.opt>span:not(.arw){flex:1;min-width:0}
+.opt:hover{transform:none;background:var(--card)}
+.opt:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.opt .txt{display:block;font-size:clamp(18px,2.7vw,22px);font-weight:500;line-height:1.24;letter-spacing:-.02em;text-wrap:pretty;text-transform:lowercase}
+.opt .lead{display:block;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--pc,var(--ink-faint));margin-bottom:5px}
+.opt .arw{opacity:1;color:var(--ink-faint);font-size:14px;padding-top:5px;flex:none}
+.opt.soft{background:transparent;box-shadow:none;border-style:solid}
+.opt.soft:before{color:var(--ink-faint)}
+.opt.soft .txt{font-weight:500;color:var(--ink-soft)}
+.linkline{margin-top:22px;display:flex;gap:18px;flex-wrap:wrap}
+.linkbtn{background:none;border:0;color:var(--accent);cursor:pointer;font-family:inherit;font-size:14px;font-weight:500;padding:8px 0}
+.linkbtn:hover{color:var(--ink)}
+
+.band{margin:34px 0 0;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  padding-bottom:10px;border-bottom:2px solid var(--bandc,var(--rule))}
+.band .num{font-family:inherit;font-size:12px;font-weight:600;letter-spacing:.14em;color:var(--bandc)}
+.band h2{font-family:inherit;font-size:clamp(19px,2.8vw,24px);margin:0;font-weight:600;letter-spacing:-.03em}
+.band .r{color:var(--ink-soft);font-size:13.5px;flex:1;min-width:200px}
+.band .c{color:var(--ink-faint);font-size:12.5px;font-weight:600;white-space:nowrap}
+.band:first-of-type{margin-top:0}
+.catsec{margin-top:34px}
+.catsec:first-of-type{margin-top:0}
+.catsec>summary.band{margin:0;cursor:pointer;list-style:none}
+.catsec>summary.band::-webkit-details-marker{display:none}
+.catsec>summary.band::after{content:"+";font-size:15px;font-weight:600;color:var(--ink-faint);align-self:center;margin-left:4px}
+.catsec[open]>summary.band::after{content:"−"}
+.catsec>summary.band:hover::after{color:var(--accent)}
+
+.grid{display:grid;gap:0}
+.probs{grid-template-columns:1fr}
+.prob{border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;box-shadow:none;
+  padding:clamp(15px,2.4vw,21px) 4px;cursor:pointer;text-align:left;transition:background .12s;
+  display:flex;flex-direction:column;gap:7px;width:100%;font-family:inherit;color:var(--ink)}
+.prob:hover{transform:none;background:var(--card)}
+.prob ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+.prob li{font-size:clamp(16px,2.4vw,19px);font-weight:500;line-height:1.3;letter-spacing:-.02em;
+  position:relative;padding-left:15px}
+.prob li:before{content:"";position:absolute;left:2px;top:.62em;width:5px;height:5px;border-radius:0;background:var(--pc)}
+.prob .foot{display:flex;justify-content:space-between;align-items:center;margin-top:3px;
+  color:var(--ink-faint);font-size:12.5px;font-weight:600}
+.prob .go{opacity:1;color:var(--pc)}
+.sym-lead{color:var(--ink-faint);font-size:11px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;margin-bottom:1px}
+
+.strat{border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;box-shadow:none;
+  padding:clamp(18px,2.6vw,26px) 4px;display:grid;grid-template-columns:minmax(0,1fr);row-gap:10px}
+.strat .top{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
+.strat h4{font-family:inherit;margin:0;font-size:clamp(21px,3.2vw,27px);font-weight:600;
+  letter-spacing:-.035em;line-height:1.1;text-wrap:pretty}
+.chip{font-size:11px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;padding:0;
+  border-radius:0;white-space:nowrap;background:transparent}
+.chip.selecao{color:var(--sel);background:transparent}
+.chip.organizacao{color:var(--org);background:transparent}
+.chip.integracao{color:var(--int);background:transparent}
+.strat p{margin:0;color:var(--ink-soft);font-size:15px;line-height:1.62;max-width:54ch}
+.defn{margin:0}
+.defn summary{cursor:pointer;list-style:none;font-size:11px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--accent);padding:2px 0}
+.defn summary::-webkit-details-marker{display:none}
+.defn summary:before{content:"+ "}
+.defn[open] summary:before{content:"− "}
+.defn p{margin:8px 0 0;color:var(--ink-faint);font-size:13.5px;line-height:1.6;max-width:54ch}
+.casos{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:0}
+.casos .lbl{font-size:11px;color:var(--ink-faint);font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+.caso{font-size:12px;font-weight:600;padding:3px 8px;border-radius:0;border:0;
+  color:var(--paper);background:var(--ink);letter-spacing:.02em;cursor:pointer;font-family:inherit;line-height:1.4}
+.caso:hover{background:var(--accent);color:var(--accent-ink)}
+.media{margin:0;border:1px dashed var(--line);border-radius:0;padding:11px 13px;display:flex;align-items:center;
+  gap:9px;color:var(--ink-faint);font-size:12.5px;background:transparent;align-self:start}
+.media.has{border-style:solid;flex-direction:column;align-items:stretch;background:transparent;padding:0;border:0}
+.media video{width:100%;max-width:520px;border-radius:0;background:#000;display:block}
+.media audio{width:100%;max-width:520px}
+.media .ex{margin:0 0 16px}
+.media .ex:last-child{margin-bottom:0}
+.media .ex figcaption{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-top:6px}
+.media .cap{font-size:12.5px;color:var(--ink-soft);margin-top:5px}
+
+.count-line{color:var(--ink-faint);font-size:11.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;margin:0 0 18px}
+.empty{color:var(--ink-soft);font-size:15px;padding:36px 0}
+mark{background:var(--sel-bg);color:var(--ink);border-radius:0;padding:0 2px}
+
+.about{background:transparent;border:0;border-top:1px solid var(--rule);border-bottom:1px solid var(--line);
+  border-radius:0;padding:14px 4px;margin:0 0 6px;box-shadow:none}
+.about summary{cursor:pointer;font-weight:500;font-size:14px;color:var(--ink);list-style:none}
+.about summary::-webkit-details-marker{display:none}
+.about summary:before{content:"+ ";color:var(--ink-faint);font-weight:600}
+.about[open] summary:before{content:"− ";color:var(--ink-faint);font-weight:600}
+.about .body{margin-top:16px;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.about .ph{border-left:2px solid var(--pc);padding-left:12px}
+.about .ph b{font-family:inherit;font-size:14px;letter-spacing:-.02em}
+.about .ph p{margin:4px 0 0;color:var(--ink-soft);font-size:13.5px}
+
+footer{border-top:1px solid var(--line);padding:20px 0 44px;color:var(--ink-faint);font-size:12.5px;text-align:left}
+footer .wrap{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between}
+
+@media (min-width:761px){
+  .strat{grid-template-columns:minmax(0,1fr) 180px;column-gap:26px;align-items:start}
+  .strat .top{grid-column:1;grid-row:1}
+  .strat p{grid-column:1;grid-row:2}
+  .defn{grid-column:1;grid-row:3}
+  .casos{grid-column:2;grid-row:1;align-items:flex-start;margin-top:5px}
+  .media{grid-column:2;grid-row:2}
+  .media.has{grid-column:1/-1;grid-row:4}
+}
+@media (max-width:900px){ .sub{display:none} }
+@media (max-width:760px){
+  header .wrap{gap:10px}
+  .tools{justify-content:stretch}
+  .search{max-width:none}
+  .seg{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--paper);
+    border-top:1px solid var(--rule);display:flex;gap:0;padding:0}
+  .seg button{flex:1;min-height:58px;font-size:13px;padding:14px 4px;text-align:center}
+  main{padding-bottom:150px}
+  footer{padding-bottom:96px}
+  .casos{margin-top:2px}
+}
+</style>
+<script>try{var _t=localStorage.getItem('bepm_theme');if(_t==='dark'||_t==='light')document.documentElement.setAttribute('data-theme',_t);}catch(e){}</script>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="brand">
+    <div class="logo">bepm</div>
+  </div>
+  <div class="tools">
+    <label class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="q" type="search" placeholder="Buscar problema, estratégia ou palavra" autocomplete="off" aria-label="Buscar no banco">
+    </label>
+    <button id="themeBtn" class="themebtn" onclick="toggleTheme()" aria-label="Mudar tema" title="Claro / escuro">
+      <svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <div class="mtog" role="group" aria-label="Formato dos exemplos">
+      <button data-m="video" aria-pressed="true">vídeo</button>
+      <button data-m="audio" aria-pressed="false">áudio</button>
+    </div>
+    <div class="seg" role="tablist">
+      <button data-tab="reflexao" aria-pressed="true">reflexão</button>
+      <button data-tab="problemas" aria-pressed="false">problemas</button>
+      <button data-tab="estrategias" aria-pressed="false">índice</button>
+    </div>
+  </div>
+</div></header>
+
+<main><div class="wrap" id="view"></div></main>
+
+<footer><div class="wrap">
+  <span>BEPM · protótipo de pesquisa · <span id="tot"></span> estratégias · funciona offline, sem instalação.</span>
+  <span>Teclado: 1 a 9 escolhe, esc volta, / busca.</span>
+</div></footer>
+
+<script>
+const DB = {"meta": {"titulo": "BEPM: Banco de Estratégias de Prática Musical", "descricao": "Estratégias de prática documentadas em pesquisa de doutorado, utilizadas por pianistas experts e testadas com pianistas iniciantes e proficientes. Organizadas pelos problemas que resolvem.", "versao": "1.0.0", "total_estrategias": 54, "casos": ["DG", "JC", "SS", "EZ", "DS", "AM"], "nota_casos": "Casos anonimizados de pianistas experts observados na tese. Cada estratégia indica em quais casos foi documentada; os exemplos de áudio/vídeo se conectarão por caso.", "vocabulario": {"verbo": ["entender", "aprender", "automatizar", "memorizar", "corrigir", "verificar", "avaliar", "criar", "arranjar", "testar", "isolar", "ligar", "representar", "facilitar"], "diagnostico": ["estou errando a execução", "erro sempre no mesmo ponto", "estou engasgando / hesito no meio", "não consigo lembrar a nota / o que vem", "decoro, mas dá branco na hora", "não consigo juntar duas coisas", "tive trava criativa", "não sei se está certo", "sai mecânico, sem o som que eu quero", "não consigo no andamento certo", "está difícil demais para tocar", "não sei o que fazer agora na sessão"]}}, "categorias": [{"id": "selecao", "numero": "I", "nome": "Seleção", "resumo": "Filtrar o que é mais relevante focar agora: trazer da memória sensorial para a memória de trabalho.", "cor": "azul"}, {"id": "organizacao", "numero": "II", "nome": "Organização", "resumo": "Dar significado, ordenar e relacionar: entender melhor o que você está treinando, dentro da memória de trabalho.", "cor": "indigo"}, {"id": "integracao", "numero": "III", "nome": "Integração", "resumo": "Lembrar e criar memórias: automatizar e juntar processos com o que já estava na memória de trabalho.", "cor": "terracota"}], "problemas": [{"id": "p01", "categoria": "selecao", "sintomas": ["corrigir informações da melodia cifrada", "entender um elemento da música", "relembrar ou conhecer a gravação"], "objetivo": "Correção da melodia cifrada"}, {"id": "p02", "categoria": "selecao", "sintomas": ["adicionar ou criar elementos que não estão na melodia cifrada"], "objetivo": "Seleção de novas informações para serem adicionadas por não estarem presentes na melodia cifrada"}, {"id": "p03", "categoria": "selecao", "sintomas": ["selecionar trechos problemáticos", "diminuir a complexidade de um trecho", "compreender um elemento de um trecho"], "objetivo": "Seleção de áreas-problema"}, {"id": "p04", "categoria": "selecao", "sintomas": ["escolher o que fazer durante a prática"], "objetivo": "Atribuição de foco ao longo da sessão de prática"}, {"id": "p05", "categoria": "organizacao", "sintomas": ["classificar os elementos da música", "identificar pontos de dificuldade ou aprimoramento", "avaliar maneiras de arranjar ou interpretar um trecho", "aumentar o domínio e a clareza mental do que se pretende tocar"], "objetivo": "Classificação do material de aprendizagem"}, {"id": "p06", "categoria": "organizacao", "sintomas": ["harmonizar um trecho", "corrigir um acorde", "definir como executar um acorde junto de outros elementos", "identificar ou expandir intervalos de um acorde"], "objetivo": "Associação de informações manipuladas e não disponíveis na melodia cifrada"}, {"id": "p07", "categoria": "organizacao", "sintomas": ["juntar partes em um todo", "ligar frases", "corrigir erros de execução"], "objetivo": "Junção de partes em um todo"}, {"id": "p08", "categoria": "integracao", "sintomas": ["automatizar um trecho a partir do som", "aumentar o domínio e a clareza mental"], "objetivo": "Relacionam imagens auditivas à execução do material musical"}, {"id": "p09", "categoria": "integracao", "sintomas": ["automatizar um trecho a partir da sensação motora", "corrigir um erro de execução", "memorizar um trecho", "limpar a execução"], "objetivo": "Relacionam imagens sinestésicas à execução do material musical"}, {"id": "p10", "categoria": "integracao", "sintomas": ["automatizar um trecho a partir da visão", "aumentar o domínio e a clareza mental"], "objetivo": "Relacionam imagens visuais à execução do material musical"}], "estrategias": [{"nome": "Avaliação de memória", "problema": "p01", "categoria": "selecao", "descricao": "Execução de uma peça musical já conhecida, apoiada pela leitura da melodia cifrada ou da partitura, sem o apoio de uma gravação. Quaisquer decisões e avaliações são realizadas de memória.", "midia": [{"tipo": "video", "src": "midia/qr25_DS_avaliacao-de-memoria.mp4", "audio": "midia/qr25_DS_avaliacao-de-memoria.m4a", "legenda": "Caso DS", "qr": 25}], "casos": ["EZ", "DS", "AM"], "facetas": {"verbo": ["verificar", "avaliar"], "diagnostico": ["não sei se está certo", "não consigo lembrar a nota / o que vem"]}, "instrucao": "Toque uma peça que você já conhece usando só a cifra, sem gravação. Tome todas as decisões de memória e veja o que você realmente lembra."}, {"nome": "Escuta simultânea", "problema": "p01", "categoria": "selecao", "descricao": "Escuta de uma gravação da peça enquanto o praticante realiza a execução no instrumento, com a intenção de confirmar identificações de notas, acordes e outros elementos musicais.", "midia": [{"tipo": "video", "src": "midia/qr01_JC_escuta-simultanea.mp4", "audio": "midia/qr01_JC_escuta-simultanea.m4a", "legenda": "Caso JC", "qr": 1}, {"tipo": "video", "src": "midia/dg_qr04.mp4", "audio": "midia/dg_qr04.m4a", "legenda": "Caso DG", "qr": 4}], "casos": ["DG", "JC"], "facetas": {"verbo": ["verificar", "corrigir", "entender"], "diagnostico": ["não sei se está certo", "não consigo lembrar a nota / o que vem"]}, "instrucao": "Toque junto com uma gravação da peça, ao mesmo tempo, para confirmar notas, acordes e outros detalhes."}, {"nome": "Escuta-execução", "problema": "p01", "categoria": "selecao", "descricao": "Escuta de um trecho de uma gravação da peça a ser executada, seguida da execução no instrumento. Empregada sempre que a verificação a partir da gravação pode acelerar o processo de prática quando comparado com a verificação baseada na memória.", "midia": [{"tipo": "video", "src": "midia/dg_qr03.mp4", "audio": "midia/dg_qr03.m4a", "legenda": "Caso DG", "qr": 3}], "casos": ["DG", "JC", "AM"], "facetas": {"verbo": ["verificar", "corrigir"], "diagnostico": ["não sei se está certo", "não consigo lembrar a nota / o que vem"]}, "instrucao": "Escute um trecho da gravação e logo em seguida toque esse mesmo trecho. Use a gravação como referência quando conferir de ouvido for mais rápido que lembrar."}, {"nome": "Verificação sistemática", "problema": "p01", "categoria": "selecao", "descricao": "Verificação de uma melodia cifrada pela escuta da música original, seguida de correção da melodia, harmonia e demais elementos anotados. O praticante \"tira de ouvido\" os elementos ausentes a partir de uma gravação de sua confiança e insere na própria melodia cifrada as anotações de todas as correções identificadas.", "midia": [{"tipo": "video", "src": "midia/dg_qr01.mp4", "audio": "midia/dg_qr01.m4a", "legenda": "Caso DG", "qr": 1}, {"tipo": "video", "src": "midia/dg_qr05.mp4", "audio": "midia/dg_qr05.m4a", "legenda": "Caso DG", "qr": 5}], "casos": ["DG"], "facetas": {"verbo": ["corrigir", "verificar"], "diagnostico": ["não sei se está certo"]}, "instrucao": "Escute a gravação original e vá corrigindo a sua cifra, melodia, harmonia e o que estiver anotado. Tire de ouvido o que faltar e marque todas as correções na própria cifra."}, {"nome": "Criação improvisatória", "problema": "p02", "categoria": "selecao", "descricao": "Criação de uma frase, harmonia ou qualquer outro elemento musical de maneira improvisatória. Antes de começar, o praticante pode estabelecer um princípio geral que regerá o improviso, ou deixar tudo que será executado sem nenhuma determinação prévia.", "midia": [{"tipo": "video", "src": "midia/qr13_SS_criacao-improvisatoria.mp4", "audio": "midia/qr13_SS_criacao-improvisatoria.m4a", "legenda": "Caso SS", "qr": 13}, {"tipo": "video", "src": "midia/dg_qr14.mp4", "audio": "midia/dg_qr14.m4a", "legenda": "Caso DG", "qr": 14}, {"tipo": "video", "src": "midia/am_criacao-improvisatoria.mp4", "audio": "midia/am_criacao-improvisatoria.m4a", "legenda": "Caso AM"}], "casos": ["SS", "EZ", "DS", "AM"], "facetas": {"verbo": ["criar"], "diagnostico": ["tive trava criativa"]}, "instrucao": "Crie a frase ou a harmonia improvisando. Se quiser, defina só um princípio geral antes de começar; ou toque sem nada combinado e veja o que surge."}, {"nome": "Criação planejada", "problema": "p02", "categoria": "selecao", "descricao": "Criação de uma frase, harmonia ou qualquer outro elemento musical de maneira planejada ou calculada. Ao invés de improvisar como o elemento é criado, o praticante estabelece previamente o que pretende fazer ou o que pode ser feito.", "midia": [], "casos": ["EZ", "DS"], "facetas": {"verbo": ["criar", "arranjar"], "diagnostico": ["tive trava criativa"]}, "instrucao": "Planeje antes de tocar: decida o que a frase ou a harmonia vai ser, em vez de improvisar. Estabeleça o que pretende fazer e então execute."}, {"nome": "Imitação do conjunto", "problema": "p02", "categoria": "selecao", "descricao": "Representação mental da música como se ela estivesse sendo tocada por um grupo, banda ou orquestra, imaginando quais elementos seriam ressaltados e explorados. Depois, faz-se uma tradução desses elementos para as possibilidades de execução ao instrumento.", "midia": [{"tipo": "video", "src": "midia/qr24_DS_imitacao-do-conjunto.mp4", "audio": "midia/qr24_DS_imitacao-do-conjunto.m4a", "legenda": "Caso DS", "qr": 24}], "casos": ["DG", "DS"], "facetas": {"verbo": ["representar", "criar"], "diagnostico": ["tive trava criativa"]}, "instrucao": "Imagine a música tocada por uma banda, big band ou orquestra e pense quais elementos apareceriam. Depois traduza essas ideias para o que dá para tocar no seu instrumento."}, {"nome": "Recorte de opções", "problema": "p02", "categoria": "selecao", "descricao": "Delimitação de como qualquer elemento musical (como harmonia, ritmo ou fraseados melódicos) pode ser criado ao se arranjar ou compor uma música. Essa delimitação acontece criando trechos estratégicos da música, por exemplo, o começo e o final de uma frase. Assim, o praticante tem a criação do meio do trecho facilitada, por ter que começar de uma nota específica e acabar em outra. Desse modo, diminui os caminhos que pode seguir para realizar a sua criação.", "midia": [{"tipo": "video", "src": "midia/dg_qr16.mp4", "audio": "midia/dg_qr16.m4a", "legenda": "Caso DG", "qr": 16}, {"tipo": "video", "src": "midia/dg_qr21.mp4", "audio": "midia/dg_qr21.m4a", "legenda": "Caso DG", "qr": 21}], "casos": ["DG", "SS"], "facetas": {"verbo": ["criar", "facilitar"], "diagnostico": ["tive trava criativa"]}, "instrucao": "Antes de criar, fixe pontos do trecho, como a primeira e a última nota da frase. Com o começo e o fim definidos, invente só o meio; isso reduz os caminhos possíveis."}, {"nome": "Vocalize de criação", "problema": "p02", "categoria": "selecao", "descricao": "O vocalize como meio de execução musical sem as restrições e tendências técnicas do piano, como fraseados que foram treinados. É usado para escolher figuras rítmicas que serão usadas no piano, mas ainda não define as alturas das notas a serem executadas no instrumento.", "midia": [{"tipo": "video", "src": "midia/qr14_SS_vocalize-de-criacao.mp4", "audio": "midia/qr14_SS_vocalize-de-criacao.m4a", "legenda": "Caso SS", "qr": 14}, {"tipo": "video", "src": "midia/dg_qr15_1.mp4", "audio": "midia/dg_qr15_1.m4a", "legenda": "Caso DG", "qr": 15}], "casos": ["DG", "SS", "EZ", "DS"], "facetas": {"verbo": ["criar", "representar"], "diagnostico": ["tive trava criativa"]}, "instrucao": "Cante a ideia em vez de tocar, para escapar dos vícios técnicos do piano. Use o canto para escolher as figuras rítmicas e deixe as alturas das notas para depois."}, {"nome": "Criação subtrativa", "problema": "p02", "categoria": "selecao", "descricao": "Criação de um elemento musical (frase, harmonia ou arranjo) que parte de uma versão densa ou complexa e vai removendo material progressivamente até uma versão consolidada. Similar a um escultor que remove o material até chegar na escultura, o arranjador começa com uma versão cheia da execução e simplifica ela até a versão final. Diferente da abordagem aditiva, em que se acrescentam camadas (vozes, levadas rítmicas, voicings), aqui o praticante trabalha por subtração, eliminando notas, vozes ou elementos até restar o essencial.", "midia": [], "casos": ["AM"], "facetas": {"verbo": ["criar", "arranjar"], "diagnostico": ["tive trava criativa"]}, "instrucao": "Comece por uma versão cheia, com mais notas e camadas do que o necessário. Ao invés de deixar para adicionar a levada rítmica, voicings de acordes etc. mais tarde, comece o arranjo com todos os elementos. Depois vá tirando material aos poucos, como um escultor que remove até a forma aparecer, até chegar na versão essencial que você quer manter."}, {"nome": "Aprendizado ascendente", "problema": "p03", "categoria": "selecao", "descricao": "Realizar um ciclo de aprendizado completo em um trecho antes de avançar na música. O trecho é lido, executado, maneiras de arranjá-lo são exploradas e ele é parcialmente automatizado antes de se continuar a leitura.", "midia": [], "casos": ["JC"], "facetas": {"verbo": ["aprender"], "diagnostico": ["não sei o que fazer agora na sessão"]}, "instrucao": "Feche um trecho por completo antes de seguir: leia, toque, explore maneiras de arranjar e automatize um pouco. Só então avance para o próximo."}, {"nome": "Aprendizado descendente", "problema": "p03", "categoria": "selecao", "descricao": "Realizar o aprendizado do geral para o particular, começando pela imagem artística, ou o quadro geral. O músico busca aprender pelo menos parcialmente várias ou todas as partes da música antes de focar detalhadamente em uma única parte específica.", "midia": [], "casos": ["DS", "AM"], "facetas": {"verbo": ["aprender"], "diagnostico": ["não sei o que fazer agora na sessão"]}, "instrucao": "Comece pelo todo, não pela parte. Aprenda ao menos um pouco de várias seções da música antes de mergulhar no detalhe de uma parte específica."}, {"nome": "Execução facilitada", "problema": "p03", "categoria": "selecao", "descricao": "Execução da harmonia de um trecho musical de uma forma que não seja difícil para o praticante. Com isso, o pianista conserva recursos atencionais que pode empregar em outros elementos da música, como a melodia ou o ritmo.", "midia": [{"tipo": "video", "src": "midia/qr02_JC_execucao-facilitada.mp4", "audio": "midia/qr02_JC_execucao-facilitada.m4a", "legenda": "Caso JC", "qr": 2}, {"tipo": "video", "src": "midia/dg_qr11.mp4", "audio": "midia/dg_qr11.m4a", "legenda": "Caso DG", "qr": 11}], "casos": ["DG", "JC", "SS", "EZ", "DS"], "facetas": {"verbo": ["facilitar", "isolar"], "diagnostico": ["está difícil demais para tocar"]}, "instrucao": "Toque a harmonia do trecho de um jeito mais fácil do que o final. Ao poupar esforço ali, sobra atenção para cuidar da melodia ou do ritmo."}, {"nome": "Feedback por gravação", "problema": "p03", "categoria": "selecao", "descricao": "Avaliação das decisões de arranjo, performance e outros comportamentos de prática a partir de um registro de vídeo ou áudio.", "midia": [], "casos": ["DG"], "facetas": {"verbo": ["avaliar"], "diagnostico": ["não sei se está certo"]}, "instrucao": "Grave a sua prática em áudio ou vídeo e depois assista. Use o registro para avaliar suas decisões de arranjo e a execução."}, {"nome": "Vocalize acompanhado", "problema": "p03", "categoria": "selecao", "descricao": "Execução no instrumento como se ele estivesse em contexto de acompanhamento, em que o vocalize simula uma cantora e o piano realiza o acompanhamento.", "midia": [{"tipo": "video", "src": "midia/qr15_SS_vocalize-acompanhado.mp4", "audio": "midia/qr15_SS_vocalize-acompanhado.m4a", "legenda": "Caso SS", "qr": 15}, {"tipo": "video", "src": "midia/qr20_EZ_vocalize-acompanhado.mp4", "audio": "midia/qr20_EZ_vocalize-acompanhado.m4a", "legenda": "Caso EZ", "qr": 20}, {"tipo": "video", "src": "midia/dg_qr10.mp4", "audio": "midia/dg_qr10.m4a", "legenda": "Caso DG", "qr": 10}], "casos": ["DG", "SS", "EZ", "DS"], "facetas": {"verbo": ["isolar", "facilitar", "entender"], "diagnostico": ["está difícil demais para tocar"]}, "instrucao": "Cante a melodia e toque o piano como se fosse o acompanhamento de um cantor. Deixe a voz conduzir enquanto as mãos acompanham."}, {"nome": "Vocalize isolado", "problema": "p03", "categoria": "selecao", "descricao": "Execução da música apenas com o vocalize, com a intenção de compreender um parâmetro como a melodia ou o ritmo.", "midia": [{"tipo": "video", "src": "midia/qr03_JC_vocalize-isolado.mp4", "audio": "midia/qr03_JC_vocalize-isolado.m4a", "legenda": "Caso JC", "qr": 3}, {"tipo": "video", "src": "midia/qr19_EZ_vocalize-isolado.mp4", "audio": "midia/qr19_EZ_vocalize-isolado.m4a", "legenda": "Caso EZ", "qr": 19}, {"tipo": "video", "src": "midia/qr26_DS_vocalize-isolado.mp4", "audio": "midia/qr26_DS_vocalize-isolado.m4a", "legenda": "Caso DS", "qr": 26}], "casos": ["JC", "SS", "EZ", "DS"], "facetas": {"verbo": ["isolar", "entender"], "diagnostico": ["está difícil demais para tocar"]}, "instrucao": "Deixe o instrumento de lado e faça a música só cantando. Use o canto para entender um aspecto de cada vez, como a melodia ou o ritmo."}, {"nome": "Resolução de problemas reativa", "problema": "p04", "categoria": "selecao", "descricao": "Resolução de problemas que não é direcionada por objetivos premeditados. Eles emergem do próprio processo de maneira intuitiva e fluida.", "midia": [], "casos": ["JC", "EZ"], "facetas": {"verbo": ["avaliar", "corrigir"], "diagnostico": ["não sei o que fazer agora na sessão"]}, "instrucao": "Deixe os problemas aparecerem enquanto você toca e resolva cada um na hora, sem um plano prévio. Siga o que a própria prática for pedindo."}, {"nome": "Criação cristalizada", "problema": "p05", "categoria": "organizacao", "descricao": "Criação rígida de um elemento musical, como a melodia ou a linha de baixo. Uma vez que uma criação é completada, ela não é alterada até o final do arranjo completo da música.", "midia": [], "casos": ["EZ"], "facetas": {"verbo": ["criar", "arranjar"], "diagnostico": ["tive trava criativa"]}, "instrucao": "Ao criar um elemento, como a melodia ou a linha de baixo, feche a decisão e não mude mais. Mantenha essa versão fixa até terminar o arranjo inteiro."}, {"nome": "Estabelecimento de guia de recuperação", "problema": "p05", "categoria": "organizacao", "descricao": "Compreensão da música a partir da classificação de alguma informação de forma significativa. Por exemplo, o praticante identifica a cadência, ou estabelece uma metáfora para pensar sobre uma frase.", "midia": [], "casos": ["SS", "EZ", "DS"], "facetas": {"verbo": ["entender", "memorizar"], "diagnostico": ["não consigo lembrar a nota / o que vem"]}, "instrucao": "Dê um significado ao que você toca para lembrar melhor. Identifique a cadência, ou crie uma metáfora para a frase, algo que sirva de guia na hora de relembrar ou de tocar a música."}, {"nome": "Exploração iterativa", "problema": "p05", "categoria": "organizacao", "descricao": "Mapeamento de maneiras pelas quais o arranjo pode ser construído, seguido do teste dessas maneiras. Sempre que uma ideia é aprovada pelo praticante, passa a ser empregada na execução até que outra melhor a substitua. Importante: durante o uso dessa estratégia, nenhuma ideia é cristalizada para a versão final do arranjo, mesmo que seja bem-sucedida.", "midia": [{"tipo": "video", "src": "midia/qr04_JC_exploracao-iterativa.mp4", "audio": "midia/qr04_JC_exploracao-iterativa.m4a", "legenda": "Caso JC", "qr": 4}, {"tipo": "video", "src": "midia/dg_qr07.mp4", "audio": "midia/dg_qr07.m4a", "legenda": "Caso DG", "qr": 7}, {"tipo": "video", "src": "midia/dg_qr08.mp4", "audio": "midia/dg_qr08.m4a", "legenda": "Caso DG", "qr": 8}], "casos": ["DG", "JC", "SS", "DS", "AM"], "facetas": {"verbo": ["testar", "arranjar", "avaliar"], "diagnostico": ["não sei se está certo"]}, "instrucao": "Levante várias maneiras de montar o arranjo e vá testando uma a uma. Adote a que funcionar até achar uma melhor, mas não feche nenhuma como definitiva por enquanto."}, {"nome": "Improvisação para representação", "problema": "p05", "categoria": "organizacao", "descricao": "Treino da improvisação antes de decisões de arranjo. Ao improvisar, o instrumentista para de tocar sempre que identifica outra maneira de improvisar sobre um trecho e testa essas maneiras, buscando a apropriação dos elementos da música. Pode ser empregada antes da construção do arranjo para que ele tenha uma representação mental mais clara da música.", "midia": [{"tipo": "video", "src": "midia/dg_qr12_1.mp4", "audio": "midia/dg_qr12_1.m4a", "legenda": "Caso DG", "qr": 12}], "casos": ["DG", "DS"], "facetas": {"verbo": ["representar", "testar"], "diagnostico": ["tive trava criativa"]}, "instrucao": "Improvise sobre o trecho antes de decidir o arranjo. Cada vez que perceber outra forma possível de improvisar, pare e experimente essa forma, até entender bem a música."}, {"nome": "Mapeamento de limitações", "problema": "p05", "categoria": "organizacao", "descricao": "Ao explorar maneiras de executar a música, o praticante identifica dificuldades e limitações relacionadas àquela maneira de executar, construindo uma lista mental dessas dificuldades.", "midia": [], "casos": ["JC", "SS", "EZ"], "facetas": {"verbo": ["avaliar", "entender"], "diagnostico": ["está difícil demais para tocar"]}, "instrucao": "Enquanto experimenta maneiras de tocar, vá anotando as dificuldades que cada uma traz. Monte uma lista dos pontos que vão precisar de trabalho e adaptações pra sua abordagem de arranjo funcionar."}, {"nome": "Passada de avaliação", "problema": "p05", "categoria": "organizacao", "descricao": "Execução de uma passada que conecta trechos menores da música e tem a intenção de fornecer uma representação do quadro geral. Pode ser empregada, por exemplo, para identificar trechos que precisam de aprimoramento, alterações ou correções. Outra situação é durante o teste de abordagens de ritmo ou de harmonização que precisam ser testadas e avaliadas.", "midia": [{"tipo": "video", "src": "midia/qr05_JC_passada-de-avaliacao.mp4", "audio": "midia/qr05_JC_passada-de-avaliacao.m4a", "legenda": "Caso JC", "qr": 5}], "casos": ["JC", "SS", "EZ", "DS", "AM"], "facetas": {"verbo": ["avaliar", "ligar"], "diagnostico": ["não sei o que fazer agora na sessão"]}, "instrucao": "Toque uma passada conectando os trechos menores para ver o quadro geral. Use ela para identificar o que precisa melhorar ou para testar abordagens de arranjo para o ritmo e harmonia."}, {"nome": "Teste livre", "problema": "p05", "categoria": "organizacao", "descricao": "Execução de um trecho onde o praticante cria uma frase que não existia antes ou busca explorar maneiras pelas quais a música pode ser executada (na harmonia, melodia etc.). Com essa estratégia, ele não sabe de antemão quais serão as dificuldades. Pode planejar detalhadamente o que será executado, ou apenas definir uma ideia geral e preencher os detalhes de maneira improvisatória. Aqui, ele busca testar o que está sendo criado, independentemente dos desafios que a criação introduz na execução. Se um desafio impedir a avaliação, provavelmente empregará outra estratégia para continuar.", "midia": [{"tipo": "video", "src": "midia/dg_qr19.mp4", "audio": "midia/dg_qr19.m4a", "legenda": "Caso DG", "qr": 19}], "casos": ["SS", "EZ", "DS"], "facetas": {"verbo": ["testar", "criar"], "diagnostico": ["tive trava criativa"]}, "instrucao": "Toque explorando livremente: crie uma frase nova ou experimente formas de executar, sem saber de antemão as dificuldades. Foque em testar a ideia; se algo travar, troque de estratégia."}, {"nome": "Teste mapeado", "problema": "p05", "categoria": "organizacao", "descricao": "Sequência de passos para testar as maneiras pelas quais o arranjo pode ser construído. Primeiro o praticante escolhe uma maneira de arranjar a música para testar, como definir uma oitava para a linha de baixo. Em seguida mapeia as dificuldades envolvidas naquela execução. Por fim, executa o trecho em andamento desacelerado, focando nas dificuldades mapeadas para possibilitar uma execução com menos hesitações.", "midia": [], "casos": ["DG", "EZ", "DS", "AM"], "facetas": {"verbo": ["testar", "arranjar"], "diagnostico": ["está difícil demais para tocar"]}, "instrucao": "Teste uma maneira de arranjar em três passos: escolha a abordagem (por exemplo, a oitava da linha de baixo), mapeie as dificuldades dela e então toque devagar focando nesses pontos para reduzir as hesitações."}, {"nome": "Variação de ritmo", "problema": "p05", "categoria": "organizacao", "descricao": "O praticante muda a maneira como acentua a harmonia e como insere a célula rítmica entre os elementos executados.", "midia": [{"tipo": "video", "src": "midia/dg_qr09.mp4", "audio": "midia/dg_qr09.m4a", "legenda": "Caso DG", "qr": 9}], "casos": ["JC", "SS", "DS"], "facetas": {"verbo": ["testar", "arranjar"], "diagnostico": ["não consigo no andamento certo"]}, "instrucao": "Mude a acentuação da harmonia e a forma como você encaixa a célula rítmica entre as notas. Experimente variações rítmicas do mesmo trecho."}, {"nome": "Verbalização para compreensão", "problema": "p05", "categoria": "organizacao", "descricao": "Verbalização da explicação de uma dificuldade, processo ou solução para que os comportamentos de prática fiquem claros para o praticante.", "midia": [{"tipo": "video", "src": "midia/qr27_DS_verbalizacao-para-compreensao.mp4", "audio": "midia/qr27_DS_verbalizacao-para-compreensao.m4a", "legenda": "Caso DS", "qr": 27}], "casos": ["DS", "AM"], "facetas": {"verbo": ["entender", "avaliar"], "diagnostico": ["não sei se está certo"]}, "instrucao": "Explique em voz alta a dificuldade, o processo ou a solução. Colocar em palavras deixa mais claro o que você está fazendo."}, {"nome": "Repetição de processamento", "problema": "p05", "categoria": "organizacao", "descricao": "Repetição contínua e imediata de uma célula mínima do trecho, como a primeira nota ou as duas primeiras notas, encadeada várias vezes sem interromper a execução. Em vez de parar para pensar, o praticante mantém essa repetição enquanto processa o que está acontecendo e a sequência motora se assenta, avançando para trabalhos e segmentos maiores assim que um objetivo é estabelecido.", "midia": [{"tipo": "video", "src": "midia/am_repeticao-de-processamento.mp4", "audio": "midia/am_repeticao-de-processamento.m4a", "legenda": "Caso AM"}], "casos": ["AM"], "facetas": {"verbo": ["entender", "avaliar", "isolar"], "diagnostico": ["está difícil demais para tocar"]}, "instrucao": "Em vez de parar para pensar, repita a primeira nota (ou as duas primeiras) do trecho, várias vezes seguidas e sem interromper. Deixe a mão assentar o movimento enquanto você processa o que está acontecendo, e o que você deveria ter feito caso tenha errado ou o que pretende fazer caso esteja criando algo. Quando estabelecer seu objetivo, toque trechos maiores."}, {"nome": "Trabalhos de harmonização", "problema": "p06", "categoria": "organizacao", "descricao": "Execução de trechos pequenos da música repetidamente, com a intenção de explorar como executar a harmonia. Durante essas repetições, o praticante foca em identificar intervalos específicos dos acordes ou associá-los a outros elementos da música, como a melodia ou o ritmo.", "midia": [{"tipo": "video", "src": "midia/qr29_DS_trabalhos-de-harmonizacao.mp4", "audio": "midia/qr29_DS_trabalhos-de-harmonizacao.m4a", "legenda": "Caso DS", "qr": 29}, {"tipo": "video", "src": "midia/am_trabalhos-de-harmonizacao.mp4", "audio": "midia/am_trabalhos-de-harmonizacao.m4a", "legenda": "Caso AM"}], "casos": ["JC", "SS", "EZ", "DS", "AM"], "facetas": {"verbo": ["entender", "testar", "isolar"], "diagnostico": ["não sei se está certo"]}, "instrucao": "Repita trechos curtos focando na harmonia. A cada repetição, identifique os intervalos dos acordes ou relacione-os com a melodia e o ritmo."}, {"nome": "Arranjo após domínio", "problema": "p07", "categoria": "organizacao", "descricao": "Aprendizagem de uma peça a partir de estágios. Inicialmente, o praticante busca compreender parâmetros como a melodia e a harmonia. Pode memorizar frases musicais ou mesmo toda a música. Depois, busca automatizar dificuldades técnicas. Somente após entender e automatizar essas dificuldades, ele realiza o arranjo da música.", "midia": [], "casos": ["SS", "DS"], "facetas": {"verbo": ["aprender", "arranjar", "ligar"], "diagnostico": ["não consigo juntar duas coisas"]}, "instrucao": "Aprenda por etapas: primeiro entenda a melodia e a harmonia (memorizando se precisar), depois automatize as dificuldades técnicas. Só monte o arranjo depois de dominar essas partes."}, {"nome": "Passada de ligação", "problema": "p07", "categoria": "organizacao", "descricao": "Execução de uma passada que busca conectar dois trechos menores da música. Caso um erro aconteça durante a passada, ela é retomada desde o começo ou de uma fronteira de seção.", "midia": [{"tipo": "video", "src": "midia/qr06_JC_passada-de-ligacao.mp4", "audio": "midia/qr06_JC_passada-de-ligacao.m4a", "legenda": "Caso JC", "qr": 6}, {"tipo": "video", "src": "midia/qr21_EZ_passada-interrompida-passada-de-ligacao.mp4", "audio": "midia/qr21_EZ_passada-interrompida-passada-de-ligacao.m4a", "legenda": "Caso EZ", "qr": 21}], "casos": ["JC", "SS", "EZ", "DS", "AM"], "facetas": {"verbo": ["ligar"], "diagnostico": ["não consigo juntar duas coisas"]}, "instrucao": "Toque ligando dois trechos. Se errar no meio, volte ao começo da passada ou à fronteira da seção e recomece a ligação."}, {"nome": "Passada ensaio", "problema": "p07", "categoria": "organizacao", "descricao": "Execução de uma passada que busca conectar dois trechos menores da música. Caso um erro aconteça, ele é ignorado, e o músico continua sua execução como faria se estivesse realizando uma performance para um público.", "midia": [{"tipo": "video", "src": "midia/qr28_DS_passada-ensaio.mp4", "audio": "midia/qr28_DS_passada-ensaio.m4a", "legenda": "Caso DS", "qr": 28}], "casos": ["DS"], "facetas": {"verbo": ["ligar", "avaliar"], "diagnostico": ["estou engasgando / hesito no meio"]}, "instrucao": "Toque ligando os trechos como se estivesse se apresentando para uma plateia. Se errar, ignore e siga em frente sem parar."}, {"nome": "Passada interrompida", "problema": "p07", "categoria": "organizacao", "descricao": "Execução de uma passada que busca conectar dois trechos menores da música. Quando erros são identificados, a execução para, corrige o erro uma vez e continua até o final da passada ou o próximo erro.", "midia": [{"tipo": "video", "src": "midia/qr07_JC_passada-interrompida.mp4", "audio": "midia/qr07_JC_passada-interrompida.m4a", "legenda": "Caso JC", "qr": 7}, {"tipo": "video", "src": "midia/qr21_EZ_passada-interrompida-passada-de-ligacao.mp4", "audio": "midia/qr21_EZ_passada-interrompida-passada-de-ligacao.m4a", "legenda": "Caso EZ", "qr": 21}, {"tipo": "video", "src": "midia/dg_qr15.mp4", "audio": "midia/dg_qr15.m4a", "legenda": "Caso DG", "qr": 15}, {"tipo": "video", "src": "midia/am_passada-interrompida.mp4", "audio": "midia/am_passada-interrompida.m4a", "legenda": "Caso AM"}], "casos": ["DG", "JC", "SS", "EZ", "DS", "AM"], "facetas": {"verbo": ["ligar", "corrigir"], "diagnostico": ["não consigo juntar duas coisas", "erro sempre no mesmo ponto"]}, "instrucao": "Toque ligando os dois trechos. Quando errar, pare, conserte o erro uma vez só e siga até o fim ou até o próximo erro."}, {"nome": "Domínio após arranjo", "problema": "p07", "categoria": "organizacao", "descricao": "Aprendizagem de uma peça em que o arranjo é definido logo no início, antes do domínio técnico. O praticante estabelece as decisões de arranjo desde o começo e, a partir delas, vai compreendendo os parâmetros da música e automatizando as dificuldades técnicas. Ao contrário do arranjo após domínio, aqui o domínio da peça é construído dentro de um arranjo já estabelecido.", "midia": [], "casos": ["AM"], "facetas": {"verbo": ["arranjar", "aprender", "automatizar"], "diagnostico": ["não sei o que fazer agora na sessão"]}, "instrucao": "Defina o arranjo logo no início, antes de dominar a peça: estabeleça as decisões de arranjo desde o começo. A partir daí, vá entendendo a música e automatizando as dificuldades técnicas já dentro desse arranjo, em vez de deixar para arranjar só depois de dominar tudo."}, {"nome": "Comparação com referência", "problema": "p08", "categoria": "integracao", "descricao": "Imitação e adaptação de uma ferramenta ou sonoridade de outra peça musical de referência para a música sendo executada. A partir da comparação, é possível atingir um resultado similar ou oposto à referência em questão.", "midia": [{"tipo": "video", "src": "midia/qr22_EZ_comparacao-com-referencia.mp4", "audio": "midia/qr22_EZ_comparacao-com-referencia.m4a", "legenda": "Caso EZ", "qr": 22}], "casos": ["EZ", "DS"], "facetas": {"verbo": ["representar", "entender"], "diagnostico": ["sai mecânico, sem o som que eu quero"]}, "instrucao": "Pegue a sonoridade de outra peça que sirva de referência e adapte para a que você está tocando. Compare as duas para chegar a um resultado parecido ou propositalmente oposto."}, {"nome": "Comparação de trechos", "problema": "p08", "categoria": "integracao", "descricao": "Comparação de dois trechos, como duas frases similares da melodia. O praticante busca compreender as similaridades e diferenças entre eles para facilitar o seu aprendizado.", "midia": [{"tipo": "video", "src": "midia/qr30_DS_comparacao-de-trechos.mp4", "audio": "midia/qr30_DS_comparacao-de-trechos.m4a", "legenda": "Caso DS", "qr": 30}], "casos": ["DS"], "facetas": {"verbo": ["entender", "memorizar"], "diagnostico": ["não consigo lembrar a nota / o que vem"]}, "instrucao": "Compare dois trechos parecidos tocando um após o outro em sequência, como duas frases da melodia. Perceba o que eles têm de igual e de diferente para aprender os dois mais rápido."}, {"nome": "Execução com contagem", "problema": "p08", "categoria": "integracao", "descricao": "Execução no instrumento enquanto o praticante conta o número de notas que precisa executar, ou conta os tempos do compasso para realizar a execução.", "midia": [], "casos": ["JC", "EZ", "DS"], "facetas": {"verbo": ["automatizar", "verificar"], "diagnostico": ["não consigo no andamento certo", "erro sempre no mesmo ponto"]}, "instrucao": "Toque contando: conte as notas que precisa tocar, ou conte os tempos do compasso, enquanto executa o trecho."}, {"nome": "Vocalize dobrado", "problema": "p08", "categoria": "integracao", "descricao": "Execução do instrumento com todos os elementos da música, enquanto o vocalize reitera a melodia.", "midia": [{"tipo": "video", "src": "midia/qr11_JC_vocalize-dobrado.mp4", "audio": "midia/qr11_JC_vocalize-dobrado.m4a", "legenda": "Caso JC", "qr": 11}, {"tipo": "video", "src": "midia/dg_qr12.mp4", "audio": "midia/dg_qr12.m4a", "legenda": "Caso DG", "qr": 12}, {"tipo": "video", "src": "midia/dg_qr18.mp4", "audio": "midia/dg_qr18.m4a", "legenda": "Caso DG", "qr": 18}], "casos": ["DG", "JC", "SS", "EZ", "DS"], "facetas": {"verbo": ["automatizar", "ligar", "entender"], "diagnostico": ["sai mecânico, sem o som que eu quero"]}, "instrucao": "Toque a música completa no instrumento e, ao mesmo tempo, cante a melodia por cima, reforçando-a com a voz."}, {"nome": "Aumento do andamento", "problema": "p09", "categoria": "integracao", "descricao": "Execução de um trecho da música em andamento acelerado. Geralmente empregada com a intenção de automatizar uma sequência motora ou identificar rapidamente onde um erro de execução está acontecendo.", "midia": [{"tipo": "video", "src": "midia/qr17_SS_aumento-do-andamento.mp4", "audio": "midia/qr17_SS_aumento-do-andamento.m4a", "legenda": "Caso SS", "qr": 17}], "casos": ["SS", "EZ", "DS"], "facetas": {"verbo": ["automatizar", "verificar"], "diagnostico": ["não consigo no andamento certo", "erro sempre no mesmo ponto"]}, "instrucao": "Toque o trecho mais rápido que o normal. Use a velocidade para firmar o movimento ou para achar depressa onde o erro está acontecendo."}, {"nome": "Automatização complementar", "problema": "p09", "categoria": "integracao", "descricao": "Automatização de um trecho pequeno que está interferindo com outro objetivo ou estratégia. O praticante interrompe o que estava fazendo para automatizar brevemente o trecho em questão e, em seguida, continuar seus objetivos anteriores.", "midia": [{"tipo": "video", "src": "midia/qr08_JC_automatizacao-complementar.mp4", "audio": "midia/qr08_JC_automatizacao-complementar.m4a", "legenda": "Caso JC", "qr": 8}], "casos": ["JC", "SS", "EZ", "DS"], "facetas": {"verbo": ["automatizar", "isolar"], "diagnostico": ["estou engasgando / hesito no meio"]}, "instrucao": "Quando um trecho pequeno estiver atrapalhando o resto, pare o que estava fazendo e automatize só ele rapidinho. Depois volte ao que você estava treinando."}, {"nome": "Automatização proativa", "problema": "p09", "categoria": "integracao", "descricao": "O praticante repete uma seção da música até que ela se torne automática. Define o problema a ser trabalhado e a duração da repetição antes de começar a treinar a seção. Sempre que ocorre um erro, reinicia a repetição desde o início.", "midia": [{"tipo": "video", "src": "midia/am_automatizacao-proativa.mp4", "audio": "midia/am_automatizacao-proativa.m4a", "legenda": "Caso AM"}], "casos": ["SS", "EZ", "DS", "AM"], "facetas": {"verbo": ["automatizar", "memorizar"], "diagnostico": ["erro sempre no mesmo ponto"]}, "instrucao": "Antes de começar, defina o trecho e por quanto tempo vai repetir. Repita a seção até ficar automática e, a cada erro, recomece do início."}, {"nome": "Automatização reativa", "problema": "p09", "categoria": "integracao", "descricao": "O praticante repete uma seção da música até que ela se torne automática. Não estabelece um plano predeterminado para a duração da repetição, variando seus pontos inicial e final. As repetições são feitas em reação às dificuldades percebidas. Sempre que um erro acontece, ele reinicia a repetição.", "midia": [{"tipo": "video", "src": "midia/am_automatizacao-reativa.mp4", "audio": "midia/am_automatizacao-reativa.m4a", "legenda": "Caso AM"}], "casos": ["JC", "SS", "EZ", "DS", "AM"], "facetas": {"verbo": ["automatizar", "memorizar"], "diagnostico": ["estou errando a execução"]}, "instrucao": "Repita a seção até ficar automática, sem plano fixo: mude os pontos de início e fim conforme as dificuldades. A cada erro, reinicie a repetição."}, {"nome": "Automatização sistematizada", "problema": "p09", "categoria": "integracao", "descricao": "Automatização de trechos da música a partir de alguns passos. Após já ter executado toda a música, o praticante automatiza as dificuldades técnicas. Para isso, começa realizando passadas de avaliação e identificando os pontos de aprimoramento. Em seguida, foca exclusivamente em um ponto de dificuldade e realiza repetições pequenas até que o trecho esteja automatizado. Após resolver todos os pontos de dificuldade de uma parte, avança para a próxima até terminar toda a peça.", "midia": [], "casos": ["SS"], "facetas": {"verbo": ["automatizar", "corrigir"], "diagnostico": ["erro sempre no mesmo ponto"]}, "instrucao": "Depois de já tocar a música inteira, automatize por passos: faça passadas de avaliação para achar os pontos difíceis, foque em um de cada vez com repetições curtas e, resolvido um, passe ao próximo até terminar a peça."}, {"nome": "Contagem com o pé", "problema": "p09", "categoria": "integracao", "descricao": "Contagem do andamento apoiada pela marcação de batidas de um dos dois pés do praticante.", "midia": [], "casos": ["DS"], "facetas": {"verbo": ["automatizar"], "diagnostico": ["não consigo no andamento certo"]}, "instrucao": "Marque o andamento batendo um dos pés enquanto toca, usando a batida do pé para sustentar a contagem."}, {"nome": "Definição do dedilhado", "problema": "p09", "categoria": "integracao", "descricao": "Definição do dedilhado, verbalmente ou por escrito.", "midia": [{"tipo": "video", "src": "midia/qr09_JC_definicao-do-dedilhado.mp4", "audio": "midia/qr09_JC_definicao-do-dedilhado.m4a", "legenda": "Caso JC", "qr": 9}], "casos": ["JC", "DS", "AM"], "facetas": {"verbo": ["facilitar", "corrigir"], "diagnostico": ["erro sempre no mesmo ponto", "está difícil demais para tocar"]}, "instrucao": "Defina o dedilhado do trecho e registre, falando em voz alta ou anotando na partitura."}, {"nome": "Diminuição do andamento", "problema": "p09", "categoria": "integracao", "descricao": "Execução de um trecho da música em andamento desacelerado. Geralmente empregada com a intenção de automatizar uma sequência motora ou realizar alguma avaliação do que está sendo executado.", "midia": [], "casos": ["JC", "SS", "EZ", "DS"], "facetas": {"verbo": ["automatizar", "facilitar", "avaliar"], "diagnostico": ["estou errando a execução", "está difícil demais para tocar"]}, "instrucao": "Toque o trecho bem mais devagar. Use a lentidão para firmar o movimento na mão ou para observar com calma o que está acontecendo."}, {"nome": "Dinâmica atenuada", "problema": "p09", "categoria": "integracao", "descricao": "Execução de um trecho da música com a intensidade da dinâmica intencionalmente mais fraca, buscando aprimorar o controle motor da execução do trecho.", "midia": [{"tipo": "video", "src": "midia/qr31_DS_dinamica-atenuada.mp4", "audio": "midia/qr31_DS_dinamica-atenuada.m4a", "legenda": "Caso DS", "qr": 31}], "casos": ["DS"], "facetas": {"verbo": ["automatizar", "facilitar"], "diagnostico": ["estou errando a execução"]}, "instrucao": "Toque o trecho de propósito mais fraco que o normal. A dinâmica baixa ajuda a apurar o controle do movimento."}, {"nome": "Dinâmica fortificada", "problema": "p09", "categoria": "integracao", "descricao": "Execução de um trecho da música com o aumento intencional da intensidade da dinâmica, para facilitar a automatização motora de sua execução.", "midia": [], "casos": ["DS", "AM"], "facetas": {"verbo": ["automatizar"], "diagnostico": ["estou errando a execução"]}, "instrucao": "Toque o trecho de propósito mais forte que o normal. A dinâmica alta ajuda a fixar o movimento na mão."}, {"nome": "Execução cega", "problema": "p09", "categoria": "integracao", "descricao": "Execução de um trecho sem olhar as mãos no piano. O praticante fecha os olhos ou direciona a cabeça para cima ou para o lado, de modo a não ver as mãos. A execução dessa maneira busca identificar erros e automatizar uma sequência motora.", "midia": [{"tipo": "video", "src": "midia/qr18_SS_execucao-cega.mp4", "audio": "midia/qr18_SS_execucao-cega.m4a", "legenda": "Caso SS", "qr": 18}, {"tipo": "video", "src": "midia/qr32_DS_execucao-cega.mp4", "audio": "midia/qr32_DS_execucao-cega.m4a", "legenda": "Caso DS", "qr": 32}], "casos": ["SS", "DS"], "facetas": {"verbo": ["automatizar", "verificar"], "diagnostico": ["erro sempre no mesmo ponto"]}, "instrucao": "Toque o trecho sem olhar para as mãos: feche os olhos ou vire a cabeça para o lado. Isso revela erros e ajuda a automatizar o movimento."}, {"nome": "Mão isolada", "problema": "p09", "categoria": "integracao", "descricao": "Execução de um trecho da música apenas com uma mão. Não está necessariamente relacionada à execução de um parâmetro musical como a harmonia, mas à automatização motora das notas que precisam ser executadas por uma mão.", "midia": [{"tipo": "video", "src": "midia/am_mao-isolada.mp4", "audio": "midia/am_mao-isolada.m4a", "legenda": "Caso AM"}], "casos": ["SS", "EZ", "DS", "AM"], "facetas": {"verbo": ["isolar", "automatizar"], "diagnostico": ["não consigo juntar duas coisas", "estou errando a execução"]}, "instrucao": "Toque o trecho com uma mão só. Foque em automatizar o movimento daquela mão antes de juntar as duas."}, {"nome": "Parâmetro isolado", "problema": "p09", "categoria": "integracao", "descricao": "Execução de um parâmetro da música isoladamente, como a harmonia ou a melodia.", "midia": [{"tipo": "video", "src": "midia/qr10_JC_parametro-isolado.mp4", "audio": "midia/qr10_JC_parametro-isolado.m4a", "legenda": "Caso JC", "qr": 10}], "casos": ["JC", "SS", "EZ", "DS", "AM"], "facetas": {"verbo": ["isolar"], "diagnostico": ["está difícil demais para tocar"]}, "instrucao": "Toque um só elemento da música por vez, como só a harmonia ou só a melodia, isolando esse parâmetro."}, {"nome": "Repetição progressiva", "problema": "p09", "categoria": "integracao", "descricao": "Repetição de um trecho pequeno da música com a intenção de automatizá-lo, para que sobre mais espaço na memória para o registro de novas informações. Assim que o trecho é automatizado, mais notas são adicionadas nas repetições subsequentes. Progressivamente, o trecho cresce até englobar quaisquer demandas técnicas (como dedilhado) que poderiam causar dificuldades na execução da peça.", "midia": [{"tipo": "video", "src": "midia/dg_qr12.mp4", "audio": "midia/dg_qr12.m4a", "legenda": "Caso DG", "qr": 12}], "casos": ["DG", "JC", "SS", "AM"], "facetas": {"verbo": ["automatizar", "memorizar"], "diagnostico": ["não consigo lembrar a nota / o que vem", "erro sempre no mesmo ponto"]}, "instrucao": "Treine um trecho no andamento final, mas em segmentos bem pequenos. Comece do começo da frase só até a primeira nota de dificuldade e pare ali. Repita até automatizar aquela primeira dificuldade, em seguida comece do começo novamente e avance até a segunda dificuldade. Repita o processo até automatizar todos os pontos de dificuldade."}, {"nome": "Simulação de percussão", "problema": "p09", "categoria": "integracao", "descricao": "Emulação de uma percussão a partir da imitação dos movimentos de um percussionista no ar, ou no corpo.", "midia": [], "casos": ["DS"], "facetas": {"verbo": ["representar", "automatizar"], "diagnostico": ["não consigo no andamento certo"]}, "instrucao": "Imite os movimentos de um percussionista no ar ou batendo no próprio corpo, reproduzindo a percussão da música sem o instrumento."}, {"nome": "Anotar guia de recuperação", "problema": "p10", "categoria": "integracao", "descricao": "Marcação da partitura ou melodia cifrada com novas informações, ou com informações pré-existentes, que facilitem a recordação da música durante a execução.", "midia": [], "casos": ["JC", "SS", "EZ"], "facetas": {"verbo": ["memorizar", "facilitar"], "diagnostico": ["decoro, mas dá branco na hora", "não consigo lembrar a nota / o que vem"]}, "instrucao": "Marque na partitura ou na cifra pistas que ajudem a lembrar a música enquanto toca, com anotações novas ou reforçando as que já existem."}]};
+const CKEY = {selecao:'sel',organizacao:'org',integracao:'int'};
+const CATS = Object.fromEntries(DB.categorias.map(c=>[c.id,c]));
+const PROBS = Object.fromEntries(DB.problemas.map(p=>[p.id,p]));
+const el = document.getElementById('view');
+document.getElementById('tot').textContent = DB.estrategias.length;
+
+const MOMENTO = {
+  selecao:    "Ainda estou descobrindo o que a música pede",
+  organizacao:"Já sei o que quero, estou organizando como tocar",
+  integracao: "Já entendo o trecho, quero fixar e automatizar"
+};
+const ANY = '*';
+
+let state = {tab:'reflexao', momento:null, diag:null, verbo:null, prob:null, query:'', media:'video', caso:null};
+try{ state.media = localStorage.getItem('bepm_media') || 'video'; }catch(e){}
+const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,'');
+function esc(s){return (s+'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function hl(t){ if(!state.query) return esc(t);
+  const n=norm(t), q=norm(state.query); let out='',i=0,idx;
+  while((idx=n.indexOf(q,i))!==-1){ out+=esc(t.slice(i,idx))+'<mark>'+esc(t.slice(idx,idx+q.length))+'</mark>'; i=idx+q.length; }
+  return out+esc(t.slice(i));
+}
+const cvar = cid => 'var(--'+CKEY[cid]+')';
+const nEstr = n => n+' estratégia'+(n===1?'':'s');
+const stratsOf = pid => DB.estrategias.filter(s=>s.problema===pid);
+
+function survivors(){
+  let r = DB.estrategias.filter(s=>s.categoria===state.momento);
+  if(state.diag && state.diag!==ANY) r=r.filter(s=>s.facetas.diagnostico.includes(state.diag));
+  if(state.verbo && state.verbo!==ANY) r=r.filter(s=>s.facetas.verbo.includes(state.verbo));
+  if(state.prob) r=r.filter(s=>s.problema===state.prob);
+  return r;
+}
+function distinct(list, key){ const seen=new Set(); list.forEach(s=>s.facetas[key].forEach(v=>seen.add(v))); return [...seen]; }
+
+function casosHTML(s){
+  if(!s.casos||!s.casos.length) return '';
+  return '<div class="casos"><span class="lbl">Casos</span>'
+    + s.casos.map(c=>'<button class="caso" onclick="filterCaso(\''+esc(c)+'\')" title="Ver estratégias do caso '+esc(c)+'">'+esc(c)+'</button>').join('')+'</div>';
+}
+function mediaHTML(s){
+  if(!s.midia||!s.midia.length) return '';
+  const inner = s.midia.map(m=>{
+    let pl;
+    if(state.media==='audio' && m.audio) pl='<audio controls preload="none" src="'+esc(m.audio)+'"></audio>';
+    else if(m.tipo==='audio') pl='<audio controls preload="none" src="'+esc(m.src)+'"></audio>';
+    else pl='<video controls preload="metadata" src="'+esc(m.src)+'"></video>';
+    const cap = m.legenda ? '<figcaption>'+esc(m.legenda)+'</figcaption>' : '';
+    return '<figure class="ex">'+pl+cap+'</figure>';
+  }).join('');
+  return '<div class="media has">'+inner+'</div>';
+}
+function stratCard(s){
+  const principal = s.instrucao || s.descricao;
+  const defn = (s.instrucao && s.descricao)
+    ? '<details class="defn"><summary>ver definição da pesquisa</summary><p>'+esc(s.descricao)+'</p></details>' : '';
+  return '<article class="strat" style="--pc:'+cvar(s.categoria)+'">'
+    +'<div class="top"><h4>'+hl(s.nome)+'</h4><span class="chip '+s.categoria+'">'+CATS[s.categoria].nome+'</span></div>'
+    +'<p>'+hl(principal)+'</p>'+defn+casosHTML(s)+mediaHTML(s)+'</article>';
+}
+function crumbs(trail,cur){
+  return '<div class="crumbs">'+ trail.map(t=>'<button onclick="'+t[1]+'">'+esc(t[0])+'</button><span class="sep">/</span>').join('')
+    +'<span class="cur">'+esc(cur)+'</span></div>';
+}
+function aboutHTML(){
+  return '<details class="about"><summary>Como o banco é organizado: os três momentos da prática</summary>'
+    +'<div class="body">'+ DB.categorias.map(c=>
+        '<div class="ph" style="--pc:'+cvar(c.id)+'"><b>'+c.numero+'. '+esc(c.nome)+'</b><p>'+esc(c.resumo)+'</p></div>'
+      ).join('') +'</div></details>';
+}
+
+function render(){
+  document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.tab===state.tab));
+  window.scrollTo({top:0});
+  if(state.query) return renderSearch();
+  if(state.caso) return renderCaso();
+  if(state.tab==='estrategias') return renderAll();
+  if(state.tab==='problemas'){ return state.prob? renderStrats() : renderProblems(); }
+  return renderReflex();
+}
+
+function reflexCrumb(){
+  const parts=[['Reflexão',"resetReflex()"]];
+  if(state.momento) parts.push([CATS[state.momento].nome, "setMomento('"+state.momento+"')"]);
+  if(state.diag) parts.push([state.diag===ANY?'qualquer':short(state.diag,22), "setDiag('"+encodeURIComponent(state.diag)+"')"]);
+  return parts;
+}
+function short(t,n){ return t.length>n? t.slice(0,n-1)+'…' : t; }
+
+function renderReflex(){
+  if(!state.momento){
+    el.innerHTML = '<p class="progress">01 / 03 · reflexão guiada</p>'
+      + '<p class="q">Onde você está na sua prática agora?</p>'
+      + '<div class="opts">'+ DB.categorias.map(c=>
+          '<button class="opt" style="--pc:'+cvar(c.id)+'" onclick="setMomento(\''+c.id+'\')">'
+          +'<span><span class="lead">'+esc(c.nome)+'</span><span class="txt">'+esc(MOMENTO[c.id])+'</span></span>'
+          +'<span class="arw">→</span></button>'
+        ).join('') +'</div>'
+      + '<div class="linkline"><button class="linkbtn" onclick="switchTab(\'problemas\')">Não sei responder, ver a lista de problemas</button></div>';
+    return;
+  }
+  if(!state.diag){
+    const opts = distinct(survivors(), 'diagnostico');
+    el.innerHTML = crumbs(reflexCrumb().slice(0,1), CATS[state.momento].nome)
+      + '<p class="progress">02 / 03 · reflexão guiada</p>'
+      + '<p class="q">O que você percebe na sua prática?</p>'
+      + '<div class="opts">'+ opts.map(d=>
+          '<button class="opt" style="--pc:'+cvar(state.momento)+'" onclick="setDiag(\''+encodeURIComponent(d)+'\')">'
+          +'<span class="txt">'+esc(d)+'</span><span class="arw">→</span></button>'
+        ).join('')
+      + '<button class="opt soft" onclick="setDiag(\''+ANY+'\')"><span class="txt">Tanto faz, seguir sem isso</span><span class="arw">→</span></button>'
+      + '</div>';
+    return;
+  }
+  if(!state.verbo){
+    const opts = distinct(survivors(), 'verbo');
+    el.innerHTML = crumbs(reflexCrumb(), 'ação')
+      + '<p class="progress">03 / 03 · reflexão guiada</p>'
+      + '<p class="q">O que você quer fazer agora?</p>'
+      + '<div class="opts">'+ opts.map(v=>
+          '<button class="opt" style="--pc:'+cvar(state.momento)+'" onclick="setVerbo(\''+encodeURIComponent(v)+'\')">'
+          +'<span class="txt">'+esc(v[0].toUpperCase()+v.slice(1))+'</span><span class="arw">→</span></button>'
+        ).join('')
+      + '<button class="opt soft" onclick="setVerbo(\''+ANY+'\')"><span class="txt">Tanto faz, ver o que sobrou</span><span class="arw">→</span></button>'
+      + '</div>';
+    return;
+  }
+  const surv = survivors();
+  const probIds = [...new Set(surv.map(s=>s.problema))];
+  if(!state.prob && probIds.length>1){
+    el.innerHTML = crumbs(reflexCrumb(), 'foco')
+      + '<p class="progress">quase lá</p>'
+      + '<p class="q">Qual foco descreve melhor a sua necessidade?</p>'
+      + '<div class="grid probs">'+ probIds.map(pid=>{
+          const p=PROBS[pid]; const n=surv.filter(s=>s.problema===pid).length;
+          return '<button class="prob" style="--pc:'+cvar(state.momento)+'" onclick="setProb(\''+pid+'\')">'
+            +'<div class="sym-lead">Quando você precisa</div>'
+            +'<ul>'+p.sintomas.map(sy=>'<li>'+esc(sy)+'</li>').join('')+'</ul>'
+            +'<div class="foot"><span>'+nEstr(n)+'</span><span class="go">ver →</span></div></button>';
+        }).join('') +'</div>'
+      + '<div class="linkline"><button class="linkbtn" onclick="setProb(\''+ANY+'\')">Ver todas as '+surv.length+' que sobraram</button></div>';
+    return;
+  }
+  renderReflexResult(surv);
+}
+function renderReflexResult(surv){
+  const list = (state.prob && state.prob!==ANY) ? surv.filter(s=>s.problema===state.prob) : surv;
+  el.innerHTML = crumbs(reflexCrumb(), 'estratégias')
+    + '<p class="progress">'+nEstr(list.length)+' para o seu momento</p>'
+    + '<p class="q">Estratégias sugeridas</p>'
+    + '<div class="grid">'+ list.map(stratCard).join('') +'</div>'
+    + '<div class="linkline"><button class="linkbtn" onclick="resetReflex()">Recomeçar a reflexão</button>'
+    + '<button class="linkbtn" onclick="switchTab(\'estrategias\')">Ver o índice completo</button></div>';
+}
+
+function renderProblems(){
+  let html = '<p class="q">Qual problema você está enfrentando?</p>'
+    + '<p class="hint">Os problemas estão agrupados pelos três momentos da prática. Vá direto ao que precisa.</p>'
+    + aboutHTML();
+  DB.categorias.forEach(c=>{
+    const ps = DB.problemas.filter(p=>p.categoria===c.id);
+    const n = DB.estrategias.filter(s=>s.categoria===c.id).length;
+    html += '<div class="band" style="--bandc:'+cvar(c.id)+'"><span class="num">'+c.numero+'</span>'
+      +'<h2>'+esc(c.nome)+'</h2><span class="r">'+esc(c.resumo)+'</span><span class="c">'+nEstr(n)+'</span></div>';
+    html += '<div class="grid probs">'+ ps.map(p=>
+      '<button class="prob" style="--pc:'+cvar(c.id)+'" onclick="openProb(\''+p.id+'\')">'
+      +'<div class="sym-lead">Quando você precisa</div>'
+      +'<ul>'+p.sintomas.map(sy=>'<li>'+esc(sy)+'</li>').join('')+'</ul>'
+      +'<div class="foot"><span>'+nEstr(stratsOf(p.id).length)+'</span><span class="go">ver →</span></div></button>'
+    ).join('') +'</div>';
+  });
+  el.innerHTML = html;
+}
+function renderStrats(){
+  const p=PROBS[state.prob], c=CATS[p.categoria];
+  el.innerHTML = crumbs([['Todos os problemas',"switchTab('problemas')"]], 'Estratégias')
+    + '<p class="q" style="--pc:'+cvar(c.id)+'">Estratégias que pianistas experts usam para isto</p>'
+    + '<p class="hint"><b>Quando você precisa:</b> '+p.sintomas.map(esc).join(' · ')
+    + '<br><span style="color:var(--ink-faint)">Objetivo na pesquisa: '+esc(p.objetivo)+'</span></p>'
+    + '<div class="grid">'+ stratsOf(state.prob).map(stratCard).join('') +'</div>';
+}
+
+function renderAll(){
+  el.innerHTML = DB.categorias.map(c=>{
+    const list=DB.estrategias.filter(s=>s.categoria===c.id);
+    return '<details class="catsec" open><summary class="band" style="--bandc:'+cvar(c.id)+'"><span class="num">'+c.numero+'</span><h2>'+esc(c.nome)
+      +'</h2><span class="r">'+esc(c.resumo)+'</span><span class="c">'+nEstr(list.length)+'</span></summary>'
+      +'<div class="grid">'+list.map(stratCard).join('')+'</div></details>';
+  }).join('');
+}
+function renderCaso(){
+  const caso=state.caso;
+  const list=DB.estrategias.filter(s=>(s.casos||[]).includes(caso));
+  let html=crumbs([['Índice',"switchTab('estrategias')"]], 'Caso '+caso)
+    + '<p class="q">Estratégias do caso '+esc(caso)+'</p>'
+    + '<p class="hint">'+nEstr(list.length)+' documentadas neste participante. Clique em outro caso para trocar, ou volte ao índice.</p>';
+  DB.categorias.forEach(c=>{
+    const sub=list.filter(s=>s.categoria===c.id);
+    if(!sub.length) return;
+    html+='<div class="band" style="--bandc:'+cvar(c.id)+'"><span class="num">'+c.numero+'</span><h2>'+esc(c.nome)
+      +'</h2><span class="r">'+esc(c.resumo)+'</span><span class="c">'+nEstr(sub.length)+'</span></div>'
+      +'<div class="grid">'+sub.map(stratCard).join('')+'</div>';
+  });
+  el.innerHTML=html;
+}
+function renderSearch(){
+  const q=norm(state.query);
+  const list=DB.estrategias.filter(s=>{
+    const extra=PROBS[s.problema].sintomas.join(' ')+' '+PROBS[s.problema].objetivo+' '
+      +s.facetas.verbo.join(' ')+' '+s.facetas.diagnostico.join(' ');
+    return norm(s.nome).includes(q)||norm(s.descricao).includes(q)||norm(s.instrucao||'').includes(q)||norm(extra).includes(q)
+      ||norm(CATS[s.categoria].nome).includes(q)||(s.casos||[]).some(c=>norm(c).includes(q));
+  });
+  el.innerHTML = '<p class="count-line">'+list.length+' resultado(s) para "'+esc(state.query)+'"</p>'
+    + (list.length? '<div class="grid">'+list.map(stratCard).join('')+'</div>'
+        : '<p class="empty">Nada encontrado. Tente outra palavra, por exemplo: andamento, harmonia, memorizar, vocalize.</p>');
+}
+
+function setHash(){
+  let h='';
+  if(state.caso) h='#caso-'+state.caso;
+  else if(state.tab==='problemas'&&state.prob) h='#prob-'+state.prob;
+  else if(state.tab==='reflexao'&&state.momento) h='#r-'+state.momento;
+  else if(state.tab!=='reflexao') h='#'+state.tab;
+  if(location.hash!==h) history.replaceState(null,'',h||location.pathname);
+}
+window.setMomento=function(m){state.momento=m;state.diag=null;state.verbo=null;state.prob=null;setHash();render();}
+window.setDiag=function(d){state.diag=decodeURIComponent(d);state.verbo=null;state.prob=null;render();}
+window.setVerbo=function(v){state.verbo=decodeURIComponent(v);state.prob=null;render();}
+window.setProb=function(p){state.prob=p;render();}
+window.resetReflex=function(){state.momento=null;state.diag=null;state.verbo=null;state.prob=null;setHash();render();}
+window.openProb=function(pid){state.prob=pid;setHash();render();}
+window.switchTab=function(t){state.tab=t;state.momento=null;state.diag=null;state.verbo=null;state.prob=null;state.caso=null;
+  document.getElementById('q').value='';state.query='';setHash();render();}
+window.filterCaso=function(c){state.caso=c;state.query='';document.getElementById('q').value='';setHash();render();}
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+document.querySelectorAll('.mtog button').forEach(b=>{
+  b.setAttribute('aria-pressed', b.dataset.m===state.media);
+  b.onclick=()=>{ state.media=b.dataset.m; try{localStorage.setItem('bepm_media',state.media)}catch(e){}
+    document.querySelectorAll('.mtog button').forEach(x=>x.setAttribute('aria-pressed', x.dataset.m===state.media));
+    render(); };
+});
+document.getElementById('q').addEventListener('input',e=>{state.query=e.target.value.trim();if(state.query)state.caso=null;render();});
+
+function themeEffective(){
+  const t=document.documentElement.getAttribute('data-theme');
+  if(t==='dark'||t==='light') return t;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+}
+function themeLabel(){ var b=document.getElementById('themeBtn');
+  if(b) b.setAttribute('aria-label', themeEffective()==='dark'?'Mudar para o modo claro':'Mudar para o modo escuro'); }
+window.toggleTheme=function(){
+  const next=themeEffective()==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  try{localStorage.setItem('bepm_theme',next)}catch(e){}
+  themeLabel();
+};
+try{ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',themeLabel); }catch(e){}
+themeLabel();
+
+function fromHash(){
+  const h=(location.hash||'').replace('#','');
+  state.caso=null;
+  if(h.startsWith('caso-')&&(DB.meta.casos||[]).includes(h.slice(5))){ state.caso=h.slice(5); }
+  else if(h.startsWith('prob-')&&PROBS[h.slice(5)]){ state.tab='problemas'; state.prob=h.slice(5); }
+  else if(h.startsWith('r-')&&CATS[h.slice(2)]){ state.tab='reflexao'; state.momento=h.slice(2); }
+  else if(h==='problemas'||h==='estrategias'||h==='reflexao'){ state.tab=h; }
+}
+window.addEventListener('hashchange',()=>{fromHash();render();});
+fromHash();
+render();
+
+function voltarPasso(){
+  if(state.query){ document.getElementById('q').value=''; state.query=''; render(); return; }
+  if(state.tab!=='reflexao'){ switchTab('reflexao'); return; }
+  if(state.prob){ state.prob=null; render(); return; }
+  if(state.verbo){ state.verbo=null; render(); return; }
+  if(state.diag){ state.diag=null; render(); return; }
+  if(state.momento){ resetReflex(); return; }
+}
+document.addEventListener('keydown', function(e){
+  const tag=((e.target&&e.target.tagName)||'').toLowerCase();
+  const digitando = tag==='input'||tag==='textarea';
+  if(e.key==='/' && !digitando){ e.preventDefault(); document.getElementById('q').focus(); return; }
+  if(e.key==='Escape'){
+    if(digitando && state.query){ document.getElementById('q').blur(); }
+    voltarPasso(); return;
+  }
+  if(digitando) return;
+  if(/^[1-9]$/.test(e.key)){
+    const lista=document.querySelectorAll('#view .opt, #view .prob');
+    const alvo=lista[parseInt(e.key,10)-1];
+    if(alvo) alvo.click();
+  }
+});
+</script>
+</body>
+</html>
